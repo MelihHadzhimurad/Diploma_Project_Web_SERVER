@@ -9,12 +9,15 @@ namespace Smart_Tire_app_Server.Services
     {
         private readonly ApplicationDbContext _context;
 
-        private readonly JwtTokenProvider _jwtTokenProvider;
+        private readonly TokenProvider2 _jwtTokenProvider;
 
-        public AuthenticationService(ApplicationDbContext context, JwtTokenProvider jwtTokenProvider)
+        private readonly PasswordHasher _passwordHasher;
+
+        public AuthenticationService(ApplicationDbContext context, TokenProvider2 jwtTokenProvider, PasswordHasher passwordHasher)
         {
             _context = context;
             _jwtTokenProvider = jwtTokenProvider;
+            _passwordHasher = passwordHasher;
         }
 
         public string CheckCredentials(string username, string pasword) 
@@ -23,13 +26,11 @@ namespace Smart_Tire_app_Server.Services
 
             foreach (User user in _context.Users)
             {
-                if (user.UserName == username && user.Password == pasword)
+                if (user.UserName == username && user.Password.Split("-")[0] == _passwordHasher.Hash(pasword).Split("-")[0])
                 {
-                    return _jwtTokenProvider.create(user);
+                    return _jwtTokenProvider.CreateToken(user);
                 }
             }
-
-
 
             throw new UserNotFoundException();
         }

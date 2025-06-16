@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Scalar.AspNetCore;
 using Smart_Tire_app_Server.DataBaseContext;
 using Smart_Tire_app_Server.Security;
 using Smart_Tire_app_Server.Services;
@@ -21,53 +22,15 @@ namespace Smart_Tire_app_Server
 
             builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DatabaseConnection")));
             builder.Services.AddControllers();
-            builder.Services.AddSingleton<JwtTokenProvider>();
+
+            builder.Services.AddScoped<TokenProvider2>();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen(c =>
-            {
-                c.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, new OpenApiSecurityScheme
-                {
-                    In = ParameterLocation.Header,
-                    Name = "Authorization",
-                    Type = SecuritySchemeType.ApiKey
-                });
+            builder.Services.AddSwaggerGen();
 
-                c.AddSecurityRequirement(new OpenApiSecurityRequirement
-                {
-                    {
-
-                        new OpenApiSecurityScheme
-                        {
-                            Reference = new OpenApiReference
-                            {
-                                Type = ReferenceType.SecurityScheme,
-                                Id = ""
-                            }
-                        },
-
-                        Array.Empty<string>()
-                    }
-                });
-            });
-
-            builder.Services.AddTransient<AuthenticationService>();
+            builder.Services.AddScoped<AuthenticationService>();
             builder.Services.AddTransient<PasswordHasher>();
-
-
-            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(options =>
-                {
-                    options.RequireHttpsMetadata = false;
-                    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters()
-                    {
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Secret"])),
-                        ValidIssuer = builder.Configuration["Jwt:Issuer"],
-                        ValidAudience = builder.Configuration["Jwt:Audience"],
-                        ClockSkew = TimeSpan.Zero,
-                        RoleClaimType = ClaimTypes.Role
-                    };
-                });
+            builder.Services.AddTransient<AdminService>();
             
             builder.Services.AddAuthorization();
 

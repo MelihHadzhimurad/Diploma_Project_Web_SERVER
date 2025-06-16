@@ -7,7 +7,6 @@ using Smart_Tire_app_Server.Services;
 
 namespace Smart_Tire_app_Server.Controllers
 {
-    [Authorize(Roles = "ADMIN")]
     [ApiController]
     [Route("admin")]
     public class AdminController : Controller
@@ -19,32 +18,32 @@ namespace Smart_Tire_app_Server.Controllers
             _adminService = adminService;
         }
 
-        [HttpGet]
+        [HttpGet("users")]
         public ActionResult<List<UserResponse>> getAllUsers()
         {
             return Ok(_adminService.getUsers());
         }
 
-        [HttpGet]
+        [HttpGet("brackets")]
         public ActionResult<List<Bracket>> getAllBrackets()
         {
             return Ok(_adminService.GetBrackets());
         }
 
-        [HttpGet]
+        [HttpGet("fines")]
         public ActionResult<List<Fine>> getAllFines()
         {
             return Ok(_adminService.GetFines());
         }
 
-        [HttpGet]
+        [HttpGet("paidfines")]
         public ActionResult<List<PaidFine>> getPaidFines()
         {
             return Ok(_adminService.GetPaidFines());
         }
 
 
-        [HttpPost]
+        [HttpPost("createuser")]
         public ActionResult<UserResponse> createUser([FromBody] CreateUserRequest createUserRequest)
         {
             try
@@ -61,7 +60,7 @@ namespace Smart_Tire_app_Server.Controllers
             catch (DuplicatedPhoneNumbersException) { return BadRequest("Въведеният телефонен номер съвпада с друг!"); }
         }
 
-        [HttpPatch]
+        [HttpPatch("updateuser")]
         public ActionResult<UserResponse> updateUserData([FromBody] UpdateUserRequest updateUser)
         {
             try

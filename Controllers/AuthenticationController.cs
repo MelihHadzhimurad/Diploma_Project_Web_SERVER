@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Smart_Tire_app_Server.Additionals;
-using Smart_Tire_app_Server.Security;
+using Smart_Tire_app_Server.CustomExceptions;
 using Smart_Tire_app_Server.Services;
 
 namespace Smart_Tire_app_Server.Controllers
@@ -11,12 +11,9 @@ namespace Smart_Tire_app_Server.Controllers
     {
         private readonly AuthenticationService _authenticationService;
 
-        private readonly PasswordHasher _passwordHasher;
-
-        public AuthenticationController(AuthenticationService authenticationService, PasswordHasher passwordHasher)
+        public AuthenticationController(AuthenticationService authenticationService)
         {
             _authenticationService = authenticationService;
-            _passwordHasher = passwordHasher;
         }
 
         [HttpPost(Name = "login")]
@@ -27,9 +24,9 @@ namespace Smart_Tire_app_Server.Controllers
                 string token = _authenticationService.CheckCredentials(request.UserName, request.Password);
                 return token;
             }
-            catch (Exception ex)
+            catch (UserNotFoundException)
             { 
-                return _passwordHasher.Hash(request.Password); 
+                return NotFound("Невалидни данни!"); 
             }
         }
     }
