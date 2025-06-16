@@ -1,0 +1,6 @@
+@Smart_Tire_app_Server_HostAddress = http://localhost:5291
+
+GET {{Smart_Tire_app_Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
